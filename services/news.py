@@ -5,10 +5,12 @@ feedparser / sgmllib3k 의존성 없이 동작한다.
 """
 
 import hashlib
+import json
 import logging
 import re
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timedelta
+from pathlib import Path
 
 import requests
 
@@ -24,6 +26,10 @@ FILTER_KEYWORDS = ["AI", "automation", "LLM", "developer", "API"]
 GOOGLE_NEWS_RSS = "https://news.google.com/rss/search?q={query}&hl=en-US&gl=US&ceid=US:en"
 
 MAX_ARTICLES_PER_KEYWORD = 10
+
+# 수집 이력 캐시 파일 경로 및 TTL
+SEEN_CACHE_PATH = "data/seen_articles.json"
+CACHE_TTL_DAYS  = 30
 
 # RSS 네임스페이스
 _NS = {"media": "http://search.yahoo.com/mrss/"}
@@ -50,10 +56,19 @@ def fetch_news_by_keyword(keyword: str, max_count: int = MAX_ARTICLES_PER_KEYWOR
         return []
 
 
-def fetch_all_news(max_per_keyword: int = MAX_ARTICLES_PER_KEYWORD) -> list[dict]:
-    """전체 키워드 수집 후 메모리 내 중복 제거"""
+def fetch_all_news(
+    max_per_keyword: int = MAX_ARTICLES_PER_KEYWORD,
+    cache_path: str = SEEN_CACHE_PATH,
+) -> list[dict]:
+    """전체 키워드 수집 후 파일 기반 중복 제거
+
+    이전 실행에서 수집된 기사는 seen_articles.json을 기준으로 제외한다.
+    신규 기사만 반환하며, 캐시는 실행 후 자동 갱신된다.
+    """
+    seen_cache = _load_seen_cache(cache_path)
+
     all_articles: list[dict] = []
-    seen_ids: set[str] = set()
+    seen_ids: set[str] = set(seen_cache.keys())  # 과거 + 이번 세션 통합
 
     for keyword in RSS_KEYWORDS:
         for article in fetch_news_by_keyword(keyword, max_per_keyword):
@@ -61,8 +76,45 @@ def fetch_all_news(max_per_keyword: int = MAX_ARTICLES_PER_KEYWORD) -> list[dict
                 seen_ids.add(article["id"])
                 all_articles.append(article)
 
-    logger.info(f"총 {len(all_articles)}개 뉴스 수집 완료 (중복 제거 후)")
+    # 새로 수집된 기사를 캐시에 추가 후 저장
+    now = datetime.now().isoformat()
+    for article in all_articles:
+        seen_cache[article["id"]] = now
+    _save_seen_cache(seen_cache, cache_path)
+
+    logger.info(
+        f"총 {len(all_articles)}개 신규 뉴스 수집 완료 "
+        f"(누적 캐시: {len(seen_cache)}개)"
+    )
     return all_articles
+
+
+# ── 파일 기반 중복 제거 캐시 ─────────────────────────────────────────────────
+
+def _load_seen_cache(cache_path: str) -> dict[str, str]:
+    """seen_articles.json 로드. 없거나 손상된 경우 빈 dict 반환."""
+    path = Path(cache_path)
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as e:
+        logger.warning(f"캐시 로드 실패, 초기화합니다: {e}")
+        return {}
+
+
+def _save_seen_cache(seen: dict[str, str], cache_path: str) -> None:
+    """seen_articles.json 저장. TTL(30일) 초과 항목은 자동 삭제."""
+    cutoff = datetime.now() - timedelta(days=CACHE_TTL_DAYS)
+    cleaned = {
+        k: v for k, v in seen.items()
+        if datetime.fromisoformat(v) > cutoff
+    }
+
+    path = Path(cache_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(cleaned, ensure_ascii=False, indent=2), encoding="utf-8")
+    logger.info(f"캐시 저장 완료: {len(cleaned)}개 항목 ({cache_path})")
 
 
 def filter_news(articles: list[dict]) -> list[dict]:
