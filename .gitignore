@@ -1,0 +1,26 @@
+# 환경변수 (절대 커밋하지 않음)
+.env
+
+# 생성된 이미지 출력물
+output/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

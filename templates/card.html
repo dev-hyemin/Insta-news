@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 1080px;
+      height: 1080px;
+      overflow: hidden;
+      background-color: #0a0a0f;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    }
+
+    .card {
+      width: 1080px;
+      height: 1080px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 72px;
+      overflow: hidden;
+    }
+
+    /* 배경 그라디언트 오버레이 */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0, 255, 136, 0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 100% 100%, rgba(0, 180, 255, 0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* 네온 테두리 */
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 24px;
+      border: 1.5px solid rgba(0, 255, 136, 0.25);
+      border-radius: 24px;
+      pointer-events: none;
+    }
+
+    /* 상단 배지 */
+    .badge {
+      position: absolute;
+      top: 52px;
+      left: 72px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-dot {
+      width: 10px;
+      height: 10px;
+      background: #00ff88;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #00ff88, 0 0 20px rgba(0, 255, 136, 0.5);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    .badge-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: #00ff88;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* 카드 번호 */
+    .card-number {
+      position: absolute;
+      top: 44px;
+      right: 72px;
+      font-size: 72px;
+      font-weight: 900;
+      color: rgba(0, 255, 136, 0.06);
+      letter-spacing: -4px;
+      line-height: 1;
+      user-select: none;
+    }
+
+    /* 구분선 */
+    .divider {
+      width: 56px;
+      height: 3px;
+      background: linear-gradient(90deg, #00ff88, transparent);
+      border-radius: 2px;
+      margin-bottom: 40px;
+      box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+    }
+
+    /* 메인 콘텐츠 */
+    .content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 880px;
+    }
+
+    .content-text {
+      font-size: 38px;
+      font-weight: 700;
+      color: #f0f0f0;
+      line-height: 1.65;
+      letter-spacing: -0.5px;
+      word-break: keep-all;
+    }
+
+    /* 강조 키워드 스타일 (텍스트에 ** 포함 시 JS로 처리) */
+    .highlight {
+      color: #00ff88;
+      text-shadow: 0 0 16px rgba(0, 255, 136, 0.6);
+    }
+
+    /* 하단 푸터 */
+    .footer {
+      position: absolute;
+      bottom: 52px;
+      left: 72px;
+      right: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-brand {
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(0, 255, 136, 0.7);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .footer-tag {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.25);
+      letter-spacing: 1px;
+    }
+
+    /* 장식 코너 */
+    .corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: rgba(0, 255, 136, 0.5);
+      border-style: solid;
+    }
+
+    .corner-tl { top: 32px; left: 32px; border-width: 2px 0 0 2px; }
+    .corner-tr { top: 32px; right: 32px; border-width: 2px 2px 0 0; }
+    .corner-bl { bottom: 32px; left: 32px; border-width: 0 0 2px 2px; }
+    .corner-br { bottom: 32px; right: 32px; border-width: 0 2px 2px 0; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <!-- 장식 코너 -->
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+
+    <!-- 상단 배지 -->
+    <div class="badge">
+      <div class="badge-dot"></div>
+      <span class="badge-text">AI News</span>
+    </div>
+
+    <!-- 카드 번호 워터마크 -->
+    <div class="card-number">{{CARD_INDEX}}</div>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="content">
+      <div class="divider"></div>
+      <p class="content-text">{{CARD_TEXT}}</p>
+    </div>
+
+    <!-- 하단 푸터 -->
+    <div class="footer">
+      <span class="footer-brand">Insta News</span>
+      <span class="footer-tag">#AI #Automation #Developer</span>
+    </div>
+  </div>
+</body>
+</html>
