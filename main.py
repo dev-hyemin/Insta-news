@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 # ── 서비스 임포트 ─────────────────────────────────────────────────────────────
 from services.news import fetch_all_news, filter_news, format_for_prompt
 from services.claude import generate_content
-from services.render import render_cards
+from services.render import render_cards, save_description
 
 
 def load_env() -> dict:
@@ -134,12 +134,22 @@ def run():
         logger.error(f"이미지 생성 실패: {e}")
         sys.exit(1)
 
+    # ── 6. Description 파일 저장 ──────────────────────────────────────────────
+    logger.info("[STEP 5] 인스타그램 description 저장")
+    desc_path = save_description(
+        output_dir=saved_dir,
+        description=parsed.insta_description,
+        tags=parsed.insta_tags,
+        title=first_title,
+    )
+
     # ── 완료 ──────────────────────────────────────────────────────────────────
     logger.info("=" * 60)
     logger.info("모든 작업 완료")
     logger.info(f"  - 뉴스 수집: {len(filtered)}개")
     logger.info(f"  - 카드 생성: {len(image_paths)}장")
     logger.info(f"  - 저장 위치: {os.path.abspath(saved_dir)}")
+    logger.info(f"  - description: {os.path.abspath(desc_path)}")
     logger.info("=" * 60)
 
 
