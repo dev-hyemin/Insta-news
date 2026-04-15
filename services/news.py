@@ -75,18 +75,6 @@ def filter_news(articles: list[dict]) -> list[dict]:
     return filtered
 
 
-def deduplicate_with_redis(articles: list[dict], redis_client) -> list[dict]:
-    """Redis를 활용한 7일 TTL 중복 제거"""
-    new_articles = []
-    for article in articles:
-        key = f"insta_news:seen:{article['id']}"
-        if not redis_client.exists(key):
-            redis_client.setex(key, 604800, "1")
-            new_articles.append(article)
-    logger.info(f"Redis 중복 제거: {len(articles)}개 → {len(new_articles)}개")
-    return new_articles
-
-
 def format_for_prompt(articles: list[dict], max_articles: int = 5) -> str:
     """Claude 프롬프트용 뉴스 텍스트 포맷팅"""
     lines = []
