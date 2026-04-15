@@ -17,6 +17,24 @@ logger = logging.getLogger(__name__)
 CARD_WIDTH = 1080
 CARD_HEIGHT = 1080
 
+# Playwright 번들 Chromium 경로 (시스템 Chrome 없는 환경 대응)
+_PLAYWRIGHT_CHROME = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
+
+
+def _find_chrome() -> str | None:
+    """사용 가능한 Chrome/Chromium 실행 파일 경로 반환"""
+    # 1. 환경변수 우선
+    env_path = os.getenv("CHROME_PATH", "")
+    if env_path and Path(env_path).exists():
+        return env_path
+
+    # 2. Playwright 번들 Chromium
+    if Path(_PLAYWRIGHT_CHROME).exists():
+        return _PLAYWRIGHT_CHROME
+
+    # 3. 시스템 경로 (None → html2image 기본 탐색)
+    return None
+
 
 def render_cards(
     cards: list[CardContent],
@@ -45,16 +63,18 @@ def render_cards(
     logger.info(f"출력 디렉토리: {os.path.abspath(output_dir)}")
 
     template_html = _load_template(template_path)
+    chrome_path = _find_chrome()
 
-    hti = Html2Image(
+    hti_kwargs: dict = dict(
         size=(CARD_WIDTH, CARD_HEIGHT),
         output_path=output_dir,
-        custom_flags=[
-            "--no-sandbox",
-            "--disable-gpu",
-            "--hide-scrollbars",
-        ],
+        custom_flags=["--no-sandbox", "--disable-gpu", "--hide-scrollbars"],
     )
+    if chrome_path:
+        hti_kwargs["browser_executable"] = chrome_path
+        logger.info(f"Chrome 경로: {chrome_path}")
+
+    hti = Html2Image(**hti_kwargs)
 
     generated_paths: list[str] = []
 
@@ -64,10 +84,7 @@ def render_cards(
         output_path = os.path.join(output_dir, filename)
 
         try:
-            hti.screenshot(
-                html_str=html,
-                save_as=filename,
-            )
+            hti.screenshot(html_str=html, save_as=filename)
             logger.info(f"  card_{card.index}.png 생성 완료")
             generated_paths.append(output_path)
         except Exception as e:
@@ -86,9 +103,7 @@ def _load_template(template_path: str) -> str:
 
 def _inject_content(template: str, card: CardContent) -> str:
     """HTML 템플릿에 카드 콘텐츠 주입"""
-    # 줄바꿈을 <br> 태그로 변환
     text_html = card.text.replace("\n", "<br>")
-
     result = template.replace("{{CARD_INDEX}}", str(card.index))
     result = result.replace("{{CARD_TEXT}}", text_html)
     return result
@@ -96,8 +111,6 @@ def _inject_content(template: str, card: CardContent) -> str:
 
 def _safe_filename(name: str) -> str:
     """파일명에서 특수문자 제거 및 공백을 언더스코어로 치환"""
-    # 알파벳, 숫자, 하이픈, 언더스코어만 허용
     safe = re.sub(r"[^\w\-]", "_", name)
-    # 연속 언더스코어 정리
     safe = re.sub(r"_+", "_", safe).strip("_")
     return safe[:50] or "card"
