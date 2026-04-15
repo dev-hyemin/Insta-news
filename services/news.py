@@ -62,31 +62,46 @@ def fetch_all_news(
 ) -> list[dict]:
     """전체 키워드 수집 후 파일 기반 중복 제거
 
-    이전 실행에서 수집된 기사는 seen_articles.json을 기준으로 제외한다.
-    신규 기사만 반환하며, 캐시는 실행 후 자동 갱신된다.
+    이전 실행에서 카드로 제작된 기사(mark_articles_as_seen으로 등록된 것)만 제외한다.
+    수집 시점에는 캐시를 쓰지 않으므로, 하루에 여러 번 실행해도 새 기사를 수집할 수 있다.
     """
     seen_cache = _load_seen_cache(cache_path)
+    seen_ids   = set(seen_cache.keys())
 
     all_articles: list[dict] = []
-    seen_ids: set[str] = set(seen_cache.keys())  # 과거 + 이번 세션 통합
+    this_run_ids: set[str]   = set()  # 이번 실행 내 중복 방지
 
     for keyword in RSS_KEYWORDS:
         for article in fetch_news_by_keyword(keyword, max_per_keyword):
-            if article["id"] not in seen_ids:
-                seen_ids.add(article["id"])
+            aid = article["id"]
+            if aid not in seen_ids and aid not in this_run_ids:
+                this_run_ids.add(aid)
                 all_articles.append(article)
-
-    # 새로 수집된 기사를 캐시에 추가 후 저장
-    now = datetime.now().isoformat()
-    for article in all_articles:
-        seen_cache[article["id"]] = now
-    _save_seen_cache(seen_cache, cache_path)
 
     logger.info(
         f"총 {len(all_articles)}개 신규 뉴스 수집 완료 "
-        f"(누적 캐시: {len(seen_cache)}개)"
+        f"(이미 사용된 기사 {len(seen_ids)}개 제외)"
     )
     return all_articles
+
+
+def mark_articles_as_seen(
+    articles: list[dict],
+    cache_path: str = SEEN_CACHE_PATH,
+) -> None:
+    """카드 생성에 실제 사용된 기사를 seen 캐시에 등록한다.
+
+    fetch_all_news가 아닌 이 함수에서만 캐시를 기록하므로,
+    카드로 만든 기사만 이후 실행에서 제외된다.
+    """
+    if not articles:
+        return
+    seen_cache = _load_seen_cache(cache_path)
+    now = datetime.now().isoformat()
+    for article in articles:
+        seen_cache[article["id"]] = now
+    _save_seen_cache(seen_cache, cache_path)
+    logger.info(f"{len(articles)}개 기사를 seen 캐시에 등록")
 
 
 # ── 파일 기반 중복 제거 캐시 ─────────────────────────────────────────────────
