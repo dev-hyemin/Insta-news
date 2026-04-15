@@ -15,8 +15,8 @@ from services.claude import CardContent
 
 logger = logging.getLogger(__name__)
 
-CARD_WIDTH = 1080
-CARD_HEIGHT = 1080
+CARD_WIDTH  = 1080
+CARD_HEIGHT = 1350  # 4:5 비율 (인스타그램 피드 최적)
 
 # Playwright 번들 Chromium 경로 (시스템 Chrome 없는 환경 대응)
 _PLAYWRIGHT_CHROME = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
