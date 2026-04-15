@@ -16,31 +16,35 @@ logger = logging.getLogger(__name__)
 
 CARD_WIDTH = 1080
 CARD_HEIGHT = 1080
-OUTPUT_DIR = "output"
 
 
 def render_cards(
     cards: list[CardContent],
     template_path: str = "templates/card.html",
-    output_dir: str = OUTPUT_DIR,
-    title_prefix: str = "news",
-) -> list[str]:
+    base_output_dir: str = "output",
+    title: str = "news",
+) -> tuple[str, list[str]]:
     """
     카드 리스트를 PNG 이미지로 렌더링
+
+    base_output_dir 하위에 title 기반 서브디렉토리를 생성하고
+    그 안에 card_1.png ~ card_N.png 를 저장한다.
 
     Args:
         cards: CardContent 리스트
         template_path: HTML 템플릿 파일 경로
-        output_dir: 이미지 출력 디렉토리
-        title_prefix: 파일명 접두사 (안전 처리 후 사용)
+        base_output_dir: 베이스 출력 디렉토리 (절대/상대 경로 모두 가능)
+        title: 서브디렉토리 이름의 기반이 될 제목
 
     Returns:
-        생성된 이미지 파일 경로 리스트
+        (서브디렉토리 경로, 생성된 이미지 파일 경로 리스트)
     """
+    safe_title = _safe_filename(title)
+    output_dir = os.path.join(base_output_dir, safe_title)
     Path(output_dir).mkdir(parents=True, exist_ok=True)
+    logger.info(f"출력 디렉토리: {os.path.abspath(output_dir)}")
 
     template_html = _load_template(template_path)
-    safe_prefix = _safe_filename(title_prefix)
 
     hti = Html2Image(
         size=(CARD_WIDTH, CARD_HEIGHT),
@@ -56,7 +60,7 @@ def render_cards(
 
     for card in cards:
         html = _inject_content(template_html, card)
-        filename = f"{safe_prefix}_card_{card.index}.png"
+        filename = f"card_{card.index}.png"
         output_path = os.path.join(output_dir, filename)
 
         try:
@@ -64,12 +68,12 @@ def render_cards(
                 html_str=html,
                 save_as=filename,
             )
-            logger.info(f"카드 이미지 생성: {output_path}")
+            logger.info(f"  card_{card.index}.png 생성 완료")
             generated_paths.append(output_path)
         except Exception as e:
             logger.error(f"카드 {card.index} 이미지 생성 실패: {e}")
 
-    return generated_paths
+    return output_dir, generated_paths
 
 
 def _load_template(template_path: str) -> str:

@@ -45,7 +45,7 @@ def build_prompt(news_text: str) -> str:
 다음 내용을 기반으로 3가지 결과를 만들어라.
 
 1. 인스타 뉴스카드 (6장)
-2. 개발자용 요약 (Notion 저장용)
+2. 개발자용 요약
 3. 자동화 아이디어
 
 조건:
@@ -263,26 +263,3 @@ def _extract_field(section: str, field_name: str) -> str:
     if match:
         return match.group(1).strip()
     return ""
-
-
-def format_notion_body(content: ParsedContent) -> str:
-    """Notion 저장용 본문 텍스트 생성"""
-    lines = [
-        "## 개발자 요약",
-        f"- **핵심**: {content.summary_core}",
-        f"- **기술**: {content.summary_tech}",
-        f"- **영향**: {content.summary_impact}",
-        "",
-        "## 자동화 아이디어",
-        f"- **아이디어1**: {content.idea_1}",
-        f"- **아이디어2**: {content.idea_2}",
-        "",
-        "## 인스타 카드 목록",
-    ]
-
-    for card in content.cards:
-        lines.append(f"### 카드 {card.index}")
-        lines.append(card.text)
-        lines.append("")
-
-    return "\n".join(lines)
