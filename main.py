@@ -31,7 +31,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ── 서비스 임포트 ─────────────────────────────────────────────────────────────
-from services.news import fetch_all_news, filter_news, format_for_prompt
+from services.news import fetch_all_news, filter_news, format_for_prompt, mark_articles_as_seen
 from services.claude import generate_content
 from services.render import render_cards, save_description
 
@@ -134,8 +134,14 @@ def run():
         logger.error(f"이미지 생성 실패: {e}")
         sys.exit(1)
 
-    # ── 6. Description 파일 저장 ──────────────────────────────────────────────
-    logger.info("[STEP 5] 인스타그램 description 저장")
+    # ── 6. 사용된 기사 seen 캐시 등록 ────────────────────────────────────────────
+    logger.info("[STEP 5] 사용된 기사 seen 캐시 등록")
+    used_articles = filtered[:5]
+    mark_articles_as_seen(used_articles)
+    logger.info(f"  → {len(used_articles)}개 기사 등록 완료 (다음 실행 시 제외)")
+
+    # ── 7. Description 파일 저장 ──────────────────────────────────────────────
+    logger.info("[STEP 6] 인스타그램 description 저장")
     desc_path = save_description(
         output_dir=saved_dir,
         description=parsed.insta_description,
@@ -146,7 +152,7 @@ def run():
     # ── 완료 ──────────────────────────────────────────────────────────────────
     logger.info("=" * 60)
     logger.info("모든 작업 완료")
-    logger.info(f"  - 뉴스 수집: {len(filtered)}개")
+    logger.info(f"  - 뉴스 수집: {len(filtered)}개 (신규)")
     logger.info(f"  - 카드 생성: {len(image_paths)}장")
     logger.info(f"  - 저장 위치: {os.path.abspath(saved_dir)}")
     logger.info(f"  - description: {os.path.abspath(desc_path)}")
