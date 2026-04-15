@@ -31,7 +31,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ── 서비스 임포트 ─────────────────────────────────────────────────────────────
-from services.news import fetch_all_news, filter_news, format_for_prompt, deduplicate_with_redis
+from services.news import fetch_all_news, filter_news, format_for_prompt
 from services.claude import generate_content
 from services.render import render_cards
 
@@ -41,7 +41,6 @@ def load_env() -> dict:
     config = {
         "claude_api_key": os.getenv("CLAUDE_API_KEY", ""),
         "output_dir": os.getenv("OUTPUT_DIR", "output"),
-        "redis_url": os.getenv("REDIS_URL", ""),
     }
 
     if not config["claude_api_key"]:
@@ -50,21 +49,6 @@ def load_env() -> dict:
         sys.exit(1)
 
     return config
-
-
-def get_redis_client(redis_url: str):
-    """Redis 클라이언트 반환 (설정 없으면 None)"""
-    if not redis_url:
-        return None
-    try:
-        import redis
-        client = redis.from_url(redis_url)
-        client.ping()
-        logger.info("Redis 연결 성공")
-        return client
-    except Exception as e:
-        logger.warning(f"Redis 연결 실패 (메모리 내 중복 제거로 폴백): {e}")
-        return None
 
 
 def make_output_subdir(base_dir: str, title: str) -> str:
@@ -88,7 +72,6 @@ def run():
 
     # ── 1. 환경변수 로드 ──────────────────────────────────────────────────────
     config = load_env()
-    redis_client = get_redis_client(config["redis_url"])
 
     # ── 2. 뉴스 수집 ──────────────────────────────────────────────────────────
     logger.info("[STEP 1] 뉴스 수집 시작")
@@ -107,12 +90,6 @@ def run():
     if not filtered:
         logger.warning("필터링 후 뉴스가 없습니다. 원본 뉴스를 사용합니다.")
         filtered = articles[:5]
-
-    if redis_client:
-        filtered = deduplicate_with_redis(filtered, redis_client)
-        if not filtered:
-            logger.info("모든 뉴스가 이미 처리됨 (Redis 중복). 종료합니다.")
-            return
 
     logger.info(f"필터링 완료: {len(filtered)}개")
 
