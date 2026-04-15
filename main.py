@@ -117,13 +117,12 @@ def run():
     logger.info("[STEP 4] 카드 이미지 생성")
 
     first_title = filtered[0]["title"] if filtered else "AI_news"
-    output_dir = make_output_subdir(config["output_dir"], first_title)
+    output_subdir = make_output_subdir(config["output_dir"], first_title)
 
     try:
         saved_dir, image_paths = render_cards(
             cards=parsed.cards,
-            base_output_dir=config["output_dir"],
-            title=first_title,
+            output_dir=output_subdir,
             template_path="templates/card.html",
         )
         logger.info(f"이미지 생성 완료: {len(image_paths)}장")
