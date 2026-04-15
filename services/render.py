@@ -39,27 +39,20 @@ def _find_chrome() -> str | None:
 
 def render_cards(
     cards: list[CardContent],
+    output_dir: str,
     template_path: str = "templates/card.html",
-    base_output_dir: str = "output",
-    title: str = "news",
 ) -> tuple[str, list[str]]:
     """
     카드 리스트를 PNG 이미지로 렌더링
 
-    base_output_dir 하위에 title 기반 서브디렉토리를 생성하고
-    그 안에 card_1.png ~ card_N.png 를 저장한다.
-
     Args:
         cards: CardContent 리스트
+        output_dir: 이미지를 저장할 디렉토리 경로 (호출자가 날짜 포함 경로 전달)
         template_path: HTML 템플릿 파일 경로
-        base_output_dir: 베이스 출력 디렉토리 (절대/상대 경로 모두 가능)
-        title: 서브디렉토리 이름의 기반이 될 제목
 
     Returns:
-        (서브디렉토리 경로, 생성된 이미지 파일 경로 리스트)
+        (저장 디렉토리 경로, 생성된 이미지 파일 경로 리스트)
     """
-    safe_title = _safe_filename(title)
-    output_dir = os.path.join(base_output_dir, safe_title)
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     logger.info(f"출력 디렉토리: {os.path.abspath(output_dir)}")
 
@@ -175,31 +168,16 @@ def save_description(
     today = date.today().strftime("%Y.%m.%d")
     tags_str = "  ".join(tags)  # 태그 사이 2칸 공백 (인스타 표준)
 
-    content = f"""━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  @findev.ai  ·  금융권개발자  ·  {today}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-[게시물 본문]
+    content = f"""금융권개발자  ·  {today}
 
 {description}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[해시태그]
-
 {tags_str}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
 
     file_path = os.path.join(output_dir, "description.txt")
     Path(file_path).write_text(content.strip(), encoding="utf-8")
     logger.info(f"description.txt 저장 완료: {file_path}")
     return file_path
-
-
-def _safe_filename(name: str) -> str:
-    """파일명에서 특수문자 제거 및 공백을 언더스코어로 치환"""
-    safe = re.sub(r"[^\w\-]", "_", name)
-    safe = re.sub(r"_+", "_", safe).strip("_")
-    return safe[:50] or "card"
