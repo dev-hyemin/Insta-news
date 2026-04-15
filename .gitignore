@@ -4,6 +4,9 @@
 # 생성된 이미지 출력물
 output/
 
+# 뉴스 수집 이력 캐시 (로컬 전용)
+data/
+
 # Python
 __pycache__/
 *.py[cod]
