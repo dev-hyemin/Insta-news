@@ -75,8 +75,14 @@ FIGMA_NODE_ID=123:456              # 단일 템플릿 프레임
 
 ### Figma API 엔드포인트 (참고)
 - `GET /v1/files/{file_key}/nodes?ids={node_id}` — 노드 구조 조회
-- `GET /v1/images/{file_key}?ids={node_id}&format=png&scale=2` — PNG export
-- `PUT /v1/files/{file_key}/nodes/{node_id}` — 노드 속성 수정
+- `GET /v1/images/{file_key}?ids={node_id}&format=png&scale=2` — PNG export (템플릿 이미지 가져오기)
+- `POST /v1/files/{file_key}/variables` — 변수 생성/수정 (텍스트 변수 방식)
+
+### 주의: Figma REST API 쓰기 제한
+Figma REST API는 노드 직접 수정(`PUT nodes`)을 지원하지 않음.
+텍스트 노드 수정은 아래 두 방법 중 하나를 사용:
+1. **Figma Variables API** — 텍스트 변수를 정의해두고 값만 업데이트 (Professional 플랜 필요)
+2. **현실적 대안** — Figma export로 배경 이미지만 가져오고, 텍스트는 Pillow로 합성 (추천)
 
 ---
 
