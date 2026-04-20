@@ -11,7 +11,7 @@
       width: 1080px;
       height: 1350px;
       overflow: hidden;
-      background: #071520;
+      background: #0E1117;
     }
 
     .card {
@@ -21,28 +21,15 @@
       display: flex;
       flex-direction: column;
       font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
-      background: #071520;
+      background: #0E1117;
       overflow: hidden;
-    }
-
-    /* ── 배경 그리드 ─────────────────────────────────── */
-    .card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(0, 255, 136, 0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 255, 136, 0.025) 1px, transparent 1px);
-      background-size: 72px 72px;
-      pointer-events: none;
-      z-index: 0;
     }
 
     /* ── macOS 윈도우 크롬 바 ────────────────────────── */
     .chrome {
-      height: 52px;
-      background: #040C15;
-      border-bottom: 1px solid rgba(0, 255, 136, 0.12);
+      height: 48px;
+      background: #080C12;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
       display: flex;
       align-items: center;
       padding: 0 24px;
@@ -52,7 +39,7 @@
       z-index: 10;
     }
 
-    .chrome-btn { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+    .chrome-btn { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; }
     .chrome-btn.red    { background: #FF5F57; }
     .chrome-btn.yellow { background: #FEBC2E; }
     .chrome-btn.green  { background: #28C840; }
@@ -64,7 +51,7 @@
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 4px;
-      color: rgba(0, 255, 136, 0.45);
+      color: rgba(255, 255, 255, 0.2);
       text-transform: uppercase;
       font-family: 'Space Mono', monospace;
     }
@@ -74,7 +61,7 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 64px 88px 60px;
+      padding: 60px 80px 56px;
       position: relative;
       z-index: 1;
       overflow: hidden;
@@ -85,10 +72,10 @@
       content: '';
       position: absolute;
       left: 0;
-      top: 64px;
-      bottom: 60px;
-      width: 4px;
-      background: linear-gradient(180deg, #00FF88 0%, #00C8FF 100%);
+      top: 60px;
+      bottom: 56px;
+      width: 3px;
+      background: rgba(255, 107, 107, 0.35);
       border-radius: 0 2px 2px 0;
     }
 
@@ -97,41 +84,29 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 52px;
+      margin-bottom: 56px;
       flex-shrink: 0;
     }
 
     .card-seq {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
-      color: rgba(0, 255, 136, 0.5);
+      color: rgba(255, 255, 255, 0.25);
       letter-spacing: 3px;
       font-family: 'Space Mono', monospace;
     }
 
     .category-pill {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
-      border: 1.5px solid rgba(0, 255, 136, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 100px;
-      padding: 8px 20px;
+      padding: 7px 18px;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 2px;
-      color: #00FF88;
+      color: rgba(255, 255, 255, 0.4);
       text-transform: uppercase;
-      background: rgba(0, 255, 136, 0.06);
-    }
-
-    .category-pill::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #00FF88;
-      box-shadow: 0 0 8px #00FF88, 0 0 16px rgba(0, 255, 136, 0.5);
-      flex-shrink: 0;
     }
 
     /* ── 콘텐츠 영역 ─────────────────────────────────── */
@@ -146,11 +121,11 @@
 
     .bg-num {
       position: absolute;
-      right: -20px;
-      bottom: -50px;
-      font-size: 300px;
-      font-weight: 700;
-      color: rgba(0, 255, 136, 0.04);
+      right: -16px;
+      bottom: -40px;
+      font-size: 280px;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.025);
       line-height: 1;
       letter-spacing: -12px;
       pointer-events: none;
@@ -159,54 +134,52 @@
     }
 
     .divider {
-      width: 56px;
-      height: 5px;
-      background: linear-gradient(90deg, #00FF88, #00C8FF);
-      border-radius: 3px;
-      margin-bottom: 36px;
-      box-shadow: 0 0 14px rgba(0, 255, 136, 0.4);
+      width: 40px;
+      height: 3px;
+      background: rgba(255, 107, 107, 0.5);
+      border-radius: 2px;
+      margin-bottom: 32px;
       flex-shrink: 0;
     }
 
+    /* 제목: 코랄 포인트 */
     .card-title {
-      font-size: 58px;
+      font-size: 56px;
       font-weight: 900;
-      color: #FFFFFF;
+      color: #FF6B6B;
       line-height: 1.3;
-      letter-spacing: -1.5px;
+      letter-spacing: -1px;
       word-break: keep-all;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       flex-shrink: 0;
     }
 
     .card-body {
-      font-size: 26px;
+      font-size: 25px;
       font-weight: 300;
-      color: rgba(160, 200, 220, 0.85);
+      color: rgba(255, 255, 255, 0.72);
       line-height: 1.9;
       word-break: keep-all;
       flex-shrink: 0;
     }
 
-    /* ── 키워드 태그 (공통) ──────────────────────────── */
+    /* ── 키워드 태그 ─────────────────────────────────── */
     .kw-tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 36px;
+      gap: 10px;
+      margin-top: 32px;
       flex-shrink: 0;
     }
 
     .kw-tag {
-      font-size: 15px;
-      font-weight: 700;
-      color: rgba(0, 200, 255, 0.75);
-      background: rgba(0, 200, 255, 0.07);
-      border: 1px solid rgba(0, 200, 255, 0.2);
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 100px;
-      padding: 8px 20px;
+      padding: 6px 16px;
       letter-spacing: 0.3px;
-      font-family: 'Noto Sans KR', sans-serif;
     }
 
     /* ── 하단 푸터 ───────────────────────────────────── */
@@ -214,35 +187,34 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 44px;
+      margin-top: 40px;
       flex-shrink: 0;
     }
 
     .brand {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
-      color: rgba(0, 255, 136, 0.4);
+      color: rgba(255, 255, 255, 0.2);
       letter-spacing: 2px;
       font-family: 'Space Mono', monospace;
     }
 
     .progress {
       display: flex;
-      gap: 7px;
+      gap: 6px;
       align-items: center;
     }
 
     .dot {
-      height: 6px;
-      width: 6px;
+      height: 5px;
+      width: 5px;
       border-radius: 3px;
-      background: rgba(0, 255, 136, 0.18);
+      background: rgba(255, 255, 255, 0.15);
     }
 
     .dot.on {
-      width: 26px;
-      background: #00FF88;
-      box-shadow: 0 0 10px rgba(0, 255, 136, 0.7);
+      width: 22px;
+      background: rgba(255, 107, 107, 0.7);
     }
 
     /* ════════════════════════════════════════════
@@ -252,7 +224,7 @@
 
     .cover .card-inner {
       align-items: center;
-      padding-top: 72px;
+      padding-top: 68px;
     }
 
     .cover .meta { justify-content: center; }
@@ -269,90 +241,58 @@
     .cover .divider {
       margin-left: auto;
       margin-right: auto;
+      background: rgba(255, 107, 107, 0.4);
     }
 
+    /* 커버 제목: 코랄, 살짝 큰 사이즈 */
     .cover .card-title {
-      font-size: 84px;
-      color: #00FF88;
-      text-shadow:
-        0 0 20px rgba(0, 255, 136, 0.6),
-        0 0 60px rgba(0, 255, 136, 0.2);
+      font-size: 80px;
+      color: #FF6B6B;
       line-height: 1.15;
-      margin-bottom: 28px;
+      letter-spacing: -2px;
     }
 
     .cover .card-body {
-      font-size: 28px;
-      color: rgba(160, 210, 195, 0.8);
+      font-size: 26px;
+      color: rgba(255, 255, 255, 0.55);
     }
 
-    /* 커버 배경 글로우 */
-    .cover-glow {
-      display: none;
-      position: absolute;
-      top: 55%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 700px;
-      height: 500px;
-      background: radial-gradient(ellipse, rgba(0, 255, 136, 0.07) 0%, transparent 65%);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .cover .cover-glow { display: block; }
-
-    /* 커버 키워드 가운데 정렬 */
     .cover .kw-tags { justify-content: center; }
-    .cover .kw-tag {
-      color: rgba(0, 255, 136, 0.65);
-      background: rgba(0, 255, 136, 0.07);
-      border-color: rgba(0, 255, 136, 0.2);
-    }
 
-    /* 커버 날짜+문구 배지 */
+    /* 커버 날짜 배지 */
     .date-badge {
       display: none;
-      margin-top: 32px;
-      padding: 10px 24px;
-      border: 1px solid rgba(0, 255, 136, 0.2);
+      margin-top: 28px;
+      padding: 8px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 100px;
-      background: rgba(0, 255, 136, 0.05);
     }
 
     .date-badge-text {
-      font-size: 16px;
-      font-weight: 700;
-      color: rgba(0, 255, 136, 0.7);
-      letter-spacing: 2px;
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.3);
+      letter-spacing: 1.5px;
       font-family: 'Space Mono', monospace;
     }
 
-    .cover .date-badge { display: inline-flex; align-items: center; gap: 10px; }
+    .cover .date-badge { display: inline-flex; align-items: center; }
 
     /* 커버 인스타 핸들 */
     .insta-handle {
       display: none;
-      align-items: center;
-      gap: 8px;
-      margin-top: 20px;
+      margin-top: 16px;
     }
 
     .insta-handle-at {
-      font-size: 15px;
-      font-weight: 700;
-      color: rgba(0, 200, 255, 0.55);
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.2);
       letter-spacing: 1px;
       font-family: 'Space Mono', monospace;
     }
 
     .cover .insta-handle { display: flex; justify-content: center; }
-
-    /* 커버 푸터: 금융권개발자 태그 강조 */
-    .cover .brand {
-      font-size: 13px;
-      color: rgba(0, 255, 136, 0.55);
-      letter-spacing: 1px;
-    }
 
     /* ════════════════════════════════════════════
        OUTRO 카드 (index = 6)
@@ -367,27 +307,34 @@
       margin-right: auto;
     }
 
+    /* outro 제목도 코랄 */
     .outro .card-title {
-      color: #00FF88;
-      text-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+      color: #FF6B6B;
     }
 
     .outro .kw-tags { justify-content: center; }
 
     .cta-box {
       display: none;
-      margin-top: 36px;
-      border: 1.5px solid rgba(0, 255, 136, 0.4);
-      border-radius: 14px;
-      padding: 20px 48px;
-      font-size: 18px;
-      font-weight: 700;
-      color: #00FF88;
-      letter-spacing: 1px;
-      background: rgba(0, 255, 136, 0.05);
-      box-shadow: 0 0 20px rgba(0, 255, 136, 0.08);
+      margin-top: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 18px 40px;
+      font-size: 17px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.35);
+      letter-spacing: 0.5px;
     }
     .outro .cta-box { display: block; }
+
+    /* CTA 박스 안 강조 */
+    .outro .cta-box strong {
+      color: rgba(255, 107, 107, 0.8);
+      font-weight: 700;
+    }
+
+    /* cover glow 제거 */
+    .cover-glow { display: none !important; }
   </style>
 </head>
 <body>
@@ -419,20 +366,18 @@
         <h1 class="card-title">{{CARD_TITLE}}</h1>
         <p class="card-body">{{CARD_BODY}}</p>
 
-        <!-- 키워드 태그 -->
         <div class="kw-tags">{{CARD_KEYWORDS}}</div>
 
-        <!-- 커버 전용: 날짜 배지 -->
+        <!-- 커버 전용 -->
         <div class="date-badge">
           <span class="date-badge-text">{{CARD_DATE}}</span>
         </div>
-
-        <!-- 커버 전용: 인스타 핸들 -->
         <div class="insta-handle">
           <span class="insta-handle-at">@findev.ai · 금융권개발자</span>
         </div>
 
-        <div class="cta-box">저장 · 팔로우로 매일 AI 뉴스 받기 ✓</div>
+        <!-- 아웃트로 전용 -->
+        <div class="cta-box">저장 · 팔로우로 <strong>매일</strong> AI 뉴스 받기 ✓</div>
       </div>
 
       <!-- 하단 푸터 -->
