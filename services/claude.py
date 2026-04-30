@@ -23,7 +23,11 @@ MAX_TOKENS = 4096
 class CardContent:
     """인스타 뉴스카드 단일 장"""
     index: int
-    text: str
+    title: str = ""                              # 굵은 헤드라인 (20자 이내)
+    body: str = ""                               # 상세 내용 (2~3줄, \n 구분)
+    category: str = ""                           # 카테고리 태그 (예: "AI | 자동화")
+    keywords: list = field(default_factory=list) # 키워드 태그 ["#AI자동화", "#LLM"]
+    text: str = ""                               # 레거시 전체 텍스트 (폴백용)
 
 
 @dataclass
@@ -35,6 +39,8 @@ class ParsedContent:
     summary_impact: str = ""
     idea_1: str = ""
     idea_2: str = ""
+    insta_description: str = ""   # 인스타 게시물 본문
+    insta_tags: list = field(default_factory=list)  # 해시태그 리스트
     raw_response: str = ""
 
 
@@ -83,17 +89,53 @@ def build_json_prompt(news_text: str) -> str:
     """JSON 형식 응답을 요청하는 프롬프트"""
     return f"""너는 개발자를 위한 AI 자동화 전문가다.
 
-다음 뉴스를 기반으로 콘텐츠를 생성하고, 반드시 아래 JSON 형식으로만 응답하라.
+다음 뉴스를 기반으로 인스타그램 카드뉴스 콘텐츠를 생성하고, 반드시 아래 JSON 형식으로만 응답하라.
 JSON 외의 다른 텍스트는 절대 포함하지 마라.
 
 {{
   "cards": [
-    {{"index": 1, "text": "카드 내용 2~3줄"}},
-    {{"index": 2, "text": "카드 내용 2~3줄"}},
-    {{"index": 3, "text": "카드 내용 2~3줄"}},
-    {{"index": 4, "text": "카드 내용 2~3줄"}},
-    {{"index": 5, "text": "카드 내용 2~3줄"}},
-    {{"index": 6, "text": "카드 내용 2~3줄"}}
+    {{
+      "index": 1,
+      "category": "AI NEWS",
+      "title": "커버 헤드라인 (20자 이내, 강렬하게)",
+      "body": "핵심 한 줄 소개",
+      "keywords": ["#AI자동화", "#LLM", "#개발자트렌드"]
+    }},
+    {{
+      "index": 2,
+      "category": "AI | 자동화",
+      "title": "핵심 인사이트 제목 (15자 이내)",
+      "body": "첫 번째 줄: 핵심 사실\\n두 번째 줄: 개발자 관점 해석\\n세 번째 줄: 실무 적용 포인트",
+      "keywords": ["#키워드1", "#키워드2", "#키워드3"]
+    }},
+    {{
+      "index": 3,
+      "category": "LLM | 개발",
+      "title": "두 번째 인사이트 제목",
+      "body": "내용 2~3줄",
+      "keywords": ["#키워드1", "#키워드2", "#키워드3"]
+    }},
+    {{
+      "index": 4,
+      "category": "산업 | 트렌드",
+      "title": "세 번째 인사이트 제목",
+      "body": "내용 2~3줄",
+      "keywords": ["#키워드1", "#키워드2", "#키워드3"]
+    }},
+    {{
+      "index": 5,
+      "category": "기술 | 실무",
+      "title": "자동화 활용 제목",
+      "body": "자동화 적용 방법 2~3줄",
+      "keywords": ["#키워드1", "#키워드2", "#키워드3"]
+    }},
+    {{
+      "index": 6,
+      "category": "정리 | 요약",
+      "title": "오늘의 핵심 정리",
+      "body": "전체 요약 1~2줄\\n저장하고 팔로우하면 매일 AI 뉴스 받아보기 ✓",
+      "keywords": ["#키워드1", "#키워드2", "#키워드3"]
+    }}
   ],
   "summary": {{
     "core": "핵심 내용",
@@ -103,11 +145,21 @@ JSON 외의 다른 텍스트는 절대 포함하지 마라.
   "ideas": {{
     "idea_1": "자동화 아이디어 1",
     "idea_2": "자동화 아이디어 2"
+  }},
+  "instagram": {{
+    "description": "인스타그램 게시물 본문 (아래 형식 준수):\n첫 줄: 강렬한 훅 문장 (숫자/질문/충격적 사실)\n\n둘째 단락: 오늘 카드에서 다루는 핵심 내용 2~3줄\n\n셋째 단락: 개발자에게 왜 중요한지 1~2줄\n\n마지막 줄: 저장하고 팔로우하면 매일 AI 뉴스를 받을 수 있어요 👉 @findev.ai",
+    "tags": ["#AI자동화", "#LLM", "#금융권개발자", "#개발자", "#인공지능", "#findevai", "추가 관련 태그 25~30개"]
   }}
 }}
 
-조건:
-- 각 카드는 2~3줄, 쉬운 표현, 자동화 방법 포함, 개발자 관점
+카드 작성 규칙:
+- title: 20자 이내, 임팩트 있는 헤드라인, 숫자/비교/질문 활용
+- body: \\n으로 줄바꿈, 2~3줄, 쉬운 표현, 개발자 관점 필수
+- category: "영역 | 세부" 형식 (예: "AI | 자동화", "LLM | 개발")
+- keywords: 해당 카드 핵심 키워드 3~4개, 반드시 # 접두사 포함, 한국어 또는 영어 (예: "#AI자동화", "#LLM", "#금융개발자")
+- 1장은 커버(티저), 6장은 아웃트로(CTA), 2~5장은 핵심 인사이트
+- instagram.description: 한국어, 개발자 타겟, 이모지 1~2개 활용, 줄바꿈은 \\n 사용
+- instagram.tags: # 포함, 25~30개, 한국어+영어 혼합, 뉴스 주제 관련 태그 위주
 - summary와 ideas는 한국어로 작성
 
 입력 데이터:
@@ -182,12 +234,21 @@ def _parse_json_response(raw: str) -> ParsedContent | None:
         return None
 
     cards = [
-        CardContent(index=c["index"], text=c["text"])
+        CardContent(
+            index=c["index"],
+            title=c.get("title", ""),
+            body=c.get("body", ""),
+            category=c.get("category", "AI NEWS"),
+            keywords=c.get("keywords", []),
+            text=c.get("text", c.get("body", "")),  # 레거시 폴백
+        )
         for c in data.get("cards", [])
     ]
 
     summary = data.get("summary", {})
     ideas = data.get("ideas", {})
+
+    instagram = data.get("instagram", {})
 
     return ParsedContent(
         cards=cards,
@@ -196,6 +257,8 @@ def _parse_json_response(raw: str) -> ParsedContent | None:
         summary_impact=summary.get("impact", ""),
         idea_1=ideas.get("idea_1", ""),
         idea_2=ideas.get("idea_2", ""),
+        insta_description=instagram.get("description", ""),
+        insta_tags=instagram.get("tags", []),
         raw_response=raw,
     )
 
